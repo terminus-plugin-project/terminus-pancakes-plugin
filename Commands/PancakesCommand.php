@@ -69,7 +69,6 @@ class PancakesCommand extends TerminusCommand {
         if (file_exists($phl)) {
 
           $command = sprintf('start /b "" "%s" -h="%s" -P=%s -u="%s" -p="%s"', $phl, $mysql_host, $mysql_port, $mysql_username, $mysql_password);
-          $this->log()->info($command);
           exec($command);
           break;
         } else {
