@@ -63,6 +63,7 @@ class PancakesCommand extends TerminusCommand {
       $possible_heidi_locations = array(
         'C:\Program Files\HeidiSQL\heidisql.exe',
         'C:\Program Files (x86)\HeidiSQL\heidisql.exe',
+        getenv('TERMINUS_PANCAKES_HEIDISQL_LOC'),
       );
 
       foreach ($possible_heidi_locations as $phl) {
