@@ -68,8 +68,12 @@ class PancakesCommand extends TerminusCommand {
 
       foreach ($possible_heidi_locations as $phl) {
         if (file_exists($phl)) {
-
-          $command = sprintf('start /b "" "%s" -h="%s" -P=%s -u="%s" -p="%s"', $phl, $mysql_host, $mysql_port, $mysql_username, $mysql_password);
+          $phl = escapeshellarg($phl);
+          $mysql_host = escapeshellarg($mysql_host);
+          $mysql_port = escapeshellarg($mysql_port);
+          $mysql_username = escapeshellarg($mysql_username);
+          $mysql_password = escapeshellarg($mysql_password);
+          $command = sprintf('start /b "" %s -h=%s -P=%s -u=%s -p=%s', $phl, $mysql_host, $mysql_port, $mysql_username, $mysql_password);
           exec($command);
           break;
         } else {
