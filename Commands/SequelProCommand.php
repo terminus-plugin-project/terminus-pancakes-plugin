@@ -2,14 +2,16 @@
 namespace Terminus\Commands;
 
 use Terminus\Commands\TerminusCommand;
+use Terminus\Exceptions\TerminusException;
 use Terminus\Models\Collections\Sites;
+use Terminus\Utils;
 
 /**
- * Say hello to the user
+ * Open Site database in SequelPro
  *
  * @command site
  */
-class PancakesCommand extends TerminusCommand {
+class SequelProCommand extends TerminusCommand {
   /**
    * Object constructor
    *
@@ -23,7 +25,7 @@ class PancakesCommand extends TerminusCommand {
   }
 
    /**
-   * Connects SequelPro to the Site
+   * Open Site database in SequelPro
    *
    * ## OPTIONS
    *
@@ -31,15 +33,21 @@ class PancakesCommand extends TerminusCommand {
    * : Site to Use
    *
    * [--env=<env>]
-   * : Environment to clear
+   * : Environment
    *
    * ## EXAMPLES
-   *  terminus site pancakes --site=test
+   *  terminus site sequelpro --site=my-site --env=dev
    *
-   * @subcommand pancakes
-   * @alias pc
+   * @subcommand sequelpro
+   * @alias sequel
    */
-  public function pancakes($args, $assoc_args) {
+  public function sequelpro($args, $assoc_args) {
+    // Check if OS is Mac
+    $os = strtoupper(substr(PHP_OS, 0, 3));
+    if ($os != 'DAR') {
+      $this->failure('Operating system is not supported.');
+    }
+
     $site = $this->sites->get(
       $this->input()->siteName(array('args' => $assoc_args))
     );
@@ -57,45 +65,20 @@ class PancakesCommand extends TerminusCommand {
     // Wake the Site
     $environment->wake();
 
-    if (\Terminus\Utils\isWindows()) {
-      $this->log()->info('Opening {site} in HeidiSQL', array('site' => $site->get('name')));
+    $this->log()->info('Opening {site} database in SequelPro', array('site' => $site->get('name')));
 
-      $possible_heidi_locations = array(
-        'C:\Program Files\HeidiSQL\heidisql.exe',
-        'C:\Program Files (x86)\HeidiSQL\heidisql.exe',
-        getenv('TERMINUS_PANCAKES_HEIDISQL_LOC'),
-      );
+    $label = sprintf('%s [%s]', $site->get('name'), $env_id);
+    $openxml = $this->getOpenFile($label, $mysql_host, $mysql_port, $mysql_username, $mysql_password, $mysql_database);
 
-      foreach ($possible_heidi_locations as $phl) {
-        if (file_exists($phl)) {
-          $phl = escapeshellarg($phl);
-          $mysql_host = escapeshellarg($mysql_host);
-          $mysql_port = escapeshellarg($mysql_port);
-          $mysql_username = escapeshellarg($mysql_username);
-          $mysql_password = escapeshellarg($mysql_password);
-          $command = sprintf('start /b "" %s -h=%s -P=%s -u=%s -p=%s', $phl, $mysql_host, $mysql_port, $mysql_username, $mysql_password);
-          exec($command);
-          break;
-        } else {
-          continue;
-        }
-      }
-    } else {
-      $this->log()->info('Opening {site} in SequelPro', array('site' => $site->get('name')));
+    $tempfile = tempnam('/tmp', 'terminus-sequelpro') . '.spf';
 
-      $label = sprintf('%s [%s]', $site->get('name'), $env_id);
-      $openxml = $this->getOpenFile($label, $mysql_host, $mysql_port, $mysql_username, $mysql_password, $mysql_database);
+    $handle = fopen($tempfile, "w");
+    fwrite($handle, $openxml);
+    fclose($handle);
 
-      $tempfile = tempnam('/tmp', 'terminus-sequelpro') . '.spf';
-
-      $handle = fopen($tempfile, "w");
-      fwrite($handle, $openxml);
-      fclose($handle);
-
-      // Open in SequelPro
-      $command = sprintf('%s %s', 'open', $tempfile);
-      exec($command);
-    }
+    // Open in SequelPro
+    $command = sprintf('%s %s', 'open', $tempfile);
+    exec($command);
   }
 
   /**
