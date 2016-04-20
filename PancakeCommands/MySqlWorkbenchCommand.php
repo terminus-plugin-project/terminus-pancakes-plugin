@@ -1,96 +1,108 @@
 <?php
-namespace Terminus\Commands;
 
-use Terminus\Commands\TerminusCommand;
-use Terminus\Models\Collections\Sites;
+namespace Terminus\Commands;
 
 /**
  * Open Site database in MySQL Workbench
- *
- * @command site
  */
-class MySQLWorkbenchCommand extends TerminusCommand {
+class MySqlWorkbenchCommand extends PancakesCommand {
+
   /**
-   * Object constructor
-   *
-   * @param array $options
-   * @return MySQLWorkbenchCommand
+   * {@inheritdoc}
    */
-  public function __construct(array $options = []) {
-    $options['require_login'] = true;
-     parent::__construct($options);
-     $this->sites = new Sites();
-  }
+  public $aliases = ['mysql-workbench', 'mysqlworkbench', 'workbench'];
+
+  /**
+   * {@inheritdoc}
+   */
+  public $app = 'MySQL Workbench';
+
+  /**
+   * - App Location
+   */
+  public $app_location;
+
+  /**
+   * - App Home Location
+   */
+  public $app_home_location;
 
   /**
    * Open Site database in MySQL Workbench
-   *
-   * ## OPTIONS
-   *
-   * [--site=<site>]
-   * : Site Name
-   *
-   * [--env=<env>]
-   * : Environment
-   *
-   * ## EXAMPLES
-   *  terminus site mysql-workbench --site=my-site --env=dev
-   *
-   * @subcommand mysql-workbench
-   * @alias workbench
    */
-  public function mysqlworkbench($args, $assoc_args) {
-    $site = $this->sites->get(
-      $this->input()->siteName(array('args' => $assoc_args))
-    );
+  public function pancakes($args, $assoc_args) {
+    $domain = $this->environment->get('id') . '-' . $this->site->get('name') . '.pantheon.io';
+    $this->connection_info['domain'] = $domain;
+    $this->connection_info['connection_id'] = md5($domain . '.connection');
+    $this->connection_info['server_instance_id'] = md5($domain . '.server');
 
-    $env = $this->input()->env(array('args' => $assoc_args, 'site' => $site));
-    $environment = $site->environments->get($env);
-    $connection_info = $environment->connectionInfo();
+    $connections_xml = $this->getConnectionXml($this->connection_info);
+    $connections_file = "{$this->app_home_location}connections.xml";
+    $this->writeXML($connections_file, $connections_xml, $domain);
 
-    $domain = $env . '-' . $site->get('name') . '.pantheon.io';
-    $connection_info['domain'] = $domain;
-    $connection_info['connection_id'] = md5($domain . '.connection');
-    $connection_info['server_instance_id'] = md5($domain . '.server');
+    $server_instances_xml = $this->getServerInstanceXml($this->connection_info);
+    $server_instances_file = "{$this->app_home_location}server_instances.xml";
+    $this->writeXML($server_instances_file, $server_instances_xml, $domain);
 
-    $this->log()->info('Opening {domain} database in MySQL Workbench', array('domain' => $domain));
+    $this->execCommand($this->app_location, [$this->flag('admin'), $domain]);
+  }
 
+  /**
+   * Validate MySQLWorkbench can run
+   *
+   * @return bool
+   */
+  protected function validate($args, $assoc_args) {
+     /* @TODO: Terminus now has Utils for this, wait until most people are using it and switch it */
     $os = strtoupper(substr(PHP_OS, 0, 3));
     switch ($os) {
       case 'DAR':
-        $workbench_cmd = '/Applications/MySQLWorkbench.app/Contents/MacOS/MySQLWorkbench --admin';
+        $candidates = array('/Applications/MySQLWorkbench.app/Contents/MacOS/MySQLWorkbench');
         $workbench_home = getenv('HOME') . '/Library/Application Support/MySQL/Workbench/';
         break;
       case 'LIN';
-        $workbench_cmd = 'mysql-workbench --admin';
+        $candidates = array('/usr/bin/mysql-workbench');
         $workbench_home = getenv('HOME') . '/.mysql/workbench/';
         break;
       case 'WIN':
-        $workbench_cmd = 'MySQLWorkbench -admin';
+        $candidates = array(
+          '\Program Files\MySQL\MySQL Workbench 6.3 CE\MySQLWorkbench.exe',
+          '\Program Files (x86)\MySQL\MySQL Workbench 6.3 CE\MySQLWorkbench.exe',
+          "'" . getenv('TERMINUS_PANCAKES_MYSQLWORKBENCH_LOC') . "'",
+        );
         $workbench_home = getenv('HOMEPATH') . '\\AppData\\Roaming\\MySQL\\Workbench\\';
         break;
+      default:
+        return FALSE;
     }
 
-    $connections_xml = $this->getConnection($connection_info);
-    $connections_file = "{$workbench_home}connections.xml";
-    $this->writeXML($connections_file, $connections_xml, $domain);
+    // Try to find the app in the path
+    foreach ($assoc_args as $key => $arg) {
+      if ($key == 'app') {
+        if ($this->which($arg)) {
+          $this->app_home_location = $workbench_home;
+          $this->app_location = '"' . $arg . '"';
+          return TRUE;
+        }
+      }
+    }
 
-    $server_instances_xml = $this->getServerInstance($connection_info);
-    $server_instances_file = "{$workbench_home}server_instances.xml";
-    $this->writeXML($server_instances_file, $server_instances_xml, $domain);
+    // Try to find the app in typical locations
+    foreach ($candidates as $candidate) {
+      if (file_exists($candidate)) {
+        $this->app_home_location = $workbench_home;
+        $this->app_location = '"' . $candidate . '"';
+        return TRUE;
+      }
+    }
 
-    // Wake the Site
-    $environment->wake();
-
-    // Open in MySQL Workbench
-    $command = sprintf('%s %s', $workbench_cmd, $domain);
-    exec($command);
+    return FALSE;
   }
 
   /**
    * Generate the XML for opening a connection in MySQL Workbench
    */
-  private function getConnection($ci) {
+  protected function getConnectionXml($ci) {
     return <<<XML
     <value type="object" struct-name="db.mgmt.Connection" id="{$ci['connection_id']}" struct-checksum="0x96ba47d8">
       <link type="object" struct-name="db.mgmt.Driver" key="driver">com.mysql.rdbms.mysql.driver.native_sshtun</link>
@@ -126,7 +138,7 @@ XML;
   /**
    * Generate the XML for opening a server instance in MySQL Workbench
    */
-  private function getServerInstance($ci) {
+  protected function getServerInstanceXml($ci) {
     return <<<XML
     <value type="object" struct-name="db.mgmt.ServerInstance" id="{$ci['server_instance_id']}" struct-checksum="0x367436e2">
       <link type="object" struct-name="db.mgmt.Connection" key="connection">{$ci['connection_id']}</link>
@@ -142,10 +154,9 @@ XML;
   /**
    * Write the XML to the configuration file
    */
-  private function writeXML($file, $xml, $domain) {
+  protected function writeXML($file, $xml, $domain) {
     $data = file_get_contents($file);
     if (!strpos($data, $domain)) {
-      $os = strtoupper(substr(PHP_OS, 0, 3));
       $lines = file($file);
       $last = sizeof($lines) - 1;
       unset($lines[$last]);
