@@ -32,7 +32,7 @@ Refer to the [Terminus Wiki](https://github.com/pantheon-systems/terminus/wiki/P
 ## Windows:
 The plugin will automatically attempt to find the HeidiSQL executable within your `Program Files` directory.  If your version of HeidiSQL is installed in a non-standard location or you are using the portable version of HeidiSQL, ensure the full path to heidisql.exe (including the executable itself) is set in the `TERMINUS_PANCAKES_HEIDISQL_LOC` environment variable.
 
-MySQL Workbench requires the executable to be in the command prompt path.  The directory to add will be similar to `C:\Program Files\MySQL\MySQL Workbench 6.3 CE\`. See http://www.computerhope.com/issues/ch000549.htm.
+Likewise, if your version of MySQL Workbench is installed outside the `Program Files` directory, make sure the `TERMINUS_PANCAKES_MYSQLWORKBENCH_LOC` environment variable is set.
 
 ## Help:
 Run `terminus help site heidi|sequel|workbench` for help.
