@@ -35,6 +35,13 @@ class MySqlWorkbenchCommand extends PancakesCommand {
     $this->connection_info['domain'] = $domain;
     $this->connection_info['connection_id'] = md5($domain . '.connection');
     $this->connection_info['server_instance_id'] = md5($domain . '.server');
+    $parts = explode(':', $connection_info['sftp_url']);
+    if (isset($parts[2])) {
+      $sftp_port = $parts[2];
+    } else {
+      $sftp_port = 2222;
+    }
+    $connection_info['sftp_port'] = $sftp_port;
 
     $connections_xml = $this->getConnectionXml($this->connection_info);
     $connections_file = "{$this->app_home_location}connections.xml";
@@ -58,11 +65,11 @@ class MySqlWorkbenchCommand extends PancakesCommand {
     switch ($os) {
       case 'DAR':
         $this->app_location = '/Applications/MySQLWorkbench.app/Contents/MacOS/MySQLWorkbench';
-        $this->app_home_location = '~/Library/Application Support/MySQL/Workbench/';
+        $this->app_home_location = getenv('HOME') . '/Library/Application Support/MySQL/Workbench/';
         break;
       case 'LIN';
         $this->app_location = 'mysql-workbench';
-        $this->app_home_location = '~/.mysql/workbench/';
+        $this->app_home_location = getenv('HOME') . '/.mysql/workbench/';
         break;
       case 'WIN':
         $candidates = array(
@@ -95,7 +102,7 @@ class MySqlWorkbenchCommand extends PancakesCommand {
     return <<<XML
     <value type="object" struct-name="db.mgmt.Connection" id="{$ci['connection_id']}" struct-checksum="0x96ba47d8">
       <link type="object" struct-name="db.mgmt.Driver" key="driver">com.mysql.rdbms.mysql.driver.native_sshtun</link>
-      <value type="string" key="hostIdentifier">Mysql@{$ci['mysql_host']}:{$ci['mysql_port']}@{$ci['sftp_host']}:{$ci['git_port']}</value>
+      <value type="string" key="hostIdentifier">Mysql@{$ci['mysql_host']}:{$ci['mysql_port']}@{$ci['sftp_host']}:{$ci['ssh_port']}</value>
       <value type="int" key="isDefault">1</value>
       <value _ptr_="0x321bf00" type="dict" key="modules"/>
       <value _ptr_="0x321bf70" type="dict" key="parameterValues">
@@ -107,7 +114,7 @@ class MySqlWorkbenchCommand extends PancakesCommand {
         <value type="int" key="port">{$ci['mysql_port']}</value>
         <value type="string" key="schema">{$ci['mysql_database']}</value>
         <value type="string" key="serverVersion">10.0.21-MariaDB-log</value>
-        <value type="string" key="sshHost">{$ci['sftp_host']}:{$ci['git_port']}</value>
+        <value type="string" key="sshHost">{$ci['sftp_host']}:{$ci['ssh_port']}</value>
         <value type="string" key="sshKeyFile"></value>
         <value type="string" key="sshPassword"></value>
         <value type="string" key="sshUserName">{$ci['sftp_username']}</value>
@@ -115,7 +122,7 @@ class MySqlWorkbenchCommand extends PancakesCommand {
         <value type="string" key="sslCert"></value>
         <value type="string" key="sslCipher"></value>
         <value type="string" key="sslKey"></value>
-        <value type="int" key="useSSL">2</value>
+        <value type="int" key="useSSL">1</value>
         <value type="string" key="userName">{$ci['mysql_username']}</value>
       </value>
       <value type="string" key="name">{$ci['domain']}</value>
