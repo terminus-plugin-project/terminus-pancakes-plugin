@@ -102,7 +102,7 @@ class MySqlWorkbenchCommand extends PancakesCommand {
     return <<<XML
     <value type="object" struct-name="db.mgmt.Connection" id="{$ci['connection_id']}" struct-checksum="0x96ba47d8">
       <link type="object" struct-name="db.mgmt.Driver" key="driver">com.mysql.rdbms.mysql.driver.native_sshtun</link>
-      <value type="string" key="hostIdentifier">Mysql@{$ci['mysql_host']}:{$ci['mysql_port']}@{$ci['sftp_host']}:{$ci['ssh_port']}</value>
+      <value type="string" key="hostIdentifier">Mysql@{$ci['mysql_host']}:{$ci['mysql_port']}@{$ci['sftp_host']}:{$ci['sftp_port']}</value>
       <value type="int" key="isDefault">1</value>
       <value _ptr_="0x321bf00" type="dict" key="modules"/>
       <value _ptr_="0x321bf70" type="dict" key="parameterValues">
@@ -114,7 +114,7 @@ class MySqlWorkbenchCommand extends PancakesCommand {
         <value type="int" key="port">{$ci['mysql_port']}</value>
         <value type="string" key="schema">{$ci['mysql_database']}</value>
         <value type="string" key="serverVersion">10.0.21-MariaDB-log</value>
-        <value type="string" key="sshHost">{$ci['sftp_host']}:{$ci['ssh_port']}</value>
+        <value type="string" key="sshHost">{$ci['sftp_host']}:{$ci['sftp_port']}</value>
         <value type="string" key="sshKeyFile"></value>
         <value type="string" key="sshPassword"></value>
         <value type="string" key="sshUserName">{$ci['sftp_username']}</value>
