@@ -2,6 +2,11 @@
 
 Terminus plugin to open any Pantheon site database using a SQL GUI client.
 
+## Installation
+**_Note:_** This plugin requires Terminus 0.13.0 or later
+
+Refer to the [Terminus Wiki](https://github.com/pantheon-systems/terminus/wiki/Plugins).
+
 ## Supported:
 [HeidiSQL](http://www.heidisql.com/) (Windows)
 
@@ -25,9 +30,6 @@ Terminus plugin to open any Pantheon site database using a SQL GUI client.
 `$ terminus site mysql-workbench`
 
 `$ terminus site workbench --site=my-company --env=dev`
-
-## Installation:
-Refer to the [Terminus Wiki](https://github.com/pantheon-systems/terminus/wiki/Plugins).
 
 ## Windows:
 The plugin will automatically attempt to find the HeidiSQL executable within your `Program Files` directory.  If your version of HeidiSQL is installed in a non-standard location or you are using the portable version of HeidiSQL, ensure the full path to heidisql.exe (including the executable itself) is set in the `TERMINUS_PANCAKES_HEIDISQL_LOC` environment variable.
