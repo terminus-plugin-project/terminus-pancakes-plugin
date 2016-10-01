@@ -2,8 +2,8 @@
 
 namespace Terminus\Commands;
 
+use Terminus\Collections\Sites;
 use Terminus\Helpers\InputHelper;
-use Terminus\Models\Collections\Sites;
 use Terminus\Models\Site;
 use Terminus\Models\Environment;
 use Terminus\Utils;
