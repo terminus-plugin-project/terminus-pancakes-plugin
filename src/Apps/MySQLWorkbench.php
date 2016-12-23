@@ -32,7 +32,7 @@ class MySQLWorkbenchCommand extends PancakesApp{
    *
    * @return bool
    */
-  protected function validate() {
+  public function validate() {
     /* @TODO: Terminus now has Utils for this, wait until most people are using it and switch it */
     $os = strtoupper(substr(PHP_OS, 0, 3));
     switch (php_uname('s')) {
