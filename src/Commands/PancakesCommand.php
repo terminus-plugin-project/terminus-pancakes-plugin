@@ -45,6 +45,17 @@ class PancakesCommand extends TerminusCommand Implements SiteAwareInterface
     $this->connection_info = $env->connectionInfo();
     $this->connection_info['site_label'] = sprintf('%s [%s]', $site->get('name'), $env->id);
 
+    $domain = $env->id . '-' . $site->get('name') . '.pantheon.io';
+    $this->connection_info['connection_id'] = md5($domain . '.connection');
+    $this->connection_info['server_instance_id'] = md5($domain . '.server');
+    $parts = explode(':', $this->connection_info['sftp_url']);
+    if (isset($parts[2])) {
+      $sftp_port = $parts[2];
+    } else {
+      $sftp_port = 2222;
+    }
+    $this->connection_info['sftp_port'] = $sftp_port;
+
     $candidate_instances = $this->getCandinatePlugins();
 
     $instance = NULL;
@@ -96,7 +107,7 @@ class PancakesCommand extends TerminusCommand Implements SiteAwareInterface
 
     if ($indirect) {
       $this->log()
-        ->info("Multiple Pancakes Applications were found: $candidates. Add --app to be specific on the app.", [
+        ->notice("Multiple Pancakes Applications were found: $candidates. Add --app to be specific on the app.", [
           'site' => $site->id,
         ]);
     }

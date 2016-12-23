@@ -29,9 +29,7 @@ class SequelProCommand extends PancakesApp{
    * Validates the app can be used
    */
   public function validate() {
-    // @TODO: Validate SequelPro better
-    // @TODO: New Terminus has better way to check OS
-    return strtoupper(substr(PHP_OS, 0, 3)) === 'DAR';
+    return php_uname('s') == 'Darwin';
   }
 
   /**
