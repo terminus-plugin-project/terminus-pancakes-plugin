@@ -5,7 +5,7 @@ Terminus plugin to open any Pantheon site database using a SQL GUI client.
 ## Installation
 **_Note:_** This plugin will only work with Terminux 1.x
 
-Refer to the [Terminus Wiki](https://github.com/pantheon-systems/terminus/wiki/Plugins).
+Refer to the [Terminus Getting Started](https://pantheon.io/docs/terminus/).
 
 ## Supported:
 [HeidiSQL](http://www.heidisql.com/) (Windows)
