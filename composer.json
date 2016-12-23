@@ -3,7 +3,19 @@
   "description": "Pancakes - A Terminus plugin for Sequel Pro",
   "homepage": "https://github.com/derimagia/terminus-pancakes",
   "license": "MIT",
+  "type": "terminus-plugin",
   "require": {
     "php": ">=5.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pantheon\\TerminusPancakes\\": "src"
+    }
+  },
+  "extra": {
+    "terminus": {
+      "compatible-version": "^1"
+    }
   }
+
 }
