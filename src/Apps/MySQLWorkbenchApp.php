@@ -40,7 +40,7 @@ class MySQLWorkbenchApp extends PancakesApp {
         $this->app_home_location = getenv('HOME') . '/Library/Application Support/MySQL/Workbench/';
         break;
       case 'Linux';
-        $this->app_location = '/usr/bin/mysql-workbench';
+        $this->app_location = 'mysql-workbench';
         $this->app_home_location = getenv('HOME') . '/.mysql/workbench/';
         break;
       case 'Windows NT':
@@ -64,7 +64,7 @@ class MySQLWorkbenchApp extends PancakesApp {
         return FALSE;
     }
 
-    return file_exists($this->app_location);
+    return $this->which($this->app_location);
   }
 
   /**
