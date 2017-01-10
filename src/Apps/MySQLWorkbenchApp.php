@@ -34,14 +34,13 @@ class MySQLWorkbenchApp extends PancakesApp {
    */
   public function validate() {
     /* @TODO: Terminus now has Utils for this, wait until most people are using it and switch it */
-    $os = strtoupper(substr(PHP_OS, 0, 3));
     switch (php_uname('s')) {
       case 'Darwin':
         $this->app_location = '/Applications/MySQLWorkbench.app/Contents/MacOS/MySQLWorkbench';
         $this->app_home_location = getenv('HOME') . '/Library/Application Support/MySQL/Workbench/';
         break;
       case 'Linux';
-        $this->app_location = 'mysql-workbench';
+        $this->app_location = '/usr/bin/mysql-workbench';
         $this->app_home_location = getenv('HOME') . '/.mysql/workbench/';
         break;
       case 'Windows NT':
@@ -65,7 +64,7 @@ class MySQLWorkbenchApp extends PancakesApp {
         return FALSE;
     }
 
-    return $this->which($this->app_location);
+    return file_exists($this->app_location);
   }
 
   /**
@@ -74,13 +73,13 @@ class MySQLWorkbenchApp extends PancakesApp {
   public function open() {
     $connections_xml = $this->getConnectionXml($this->connection_info);
     $connections_file = "{$this->app_home_location}connections.xml";
-    $this->writeXML($connections_file, $connections_xml, $this->connection_info['domain']);
+    $this->writeXML($connections_file, $connections_xml, $this->connection_info['sftp_host']);
 
     $server_instances_xml = $this->getServerInstanceXml($this->connection_info);
     $server_instances_file = "{$this->app_home_location}server_instances.xml";
-    $this->writeXML($server_instances_file, $server_instances_xml, $this->connection_info['domain']);
+    $this->writeXML($server_instances_file, $server_instances_xml, $this->connection_info['sftp_host']);
 
-    $this->execCommand($this->app_location, [$this->flag('admin'), $this->connection_info['domain']]);
+    $this->execCommand($this->app_location, [$this->flag('admin'), $this->connection_info['sftp_host']]);
   }
 
   /**
@@ -90,7 +89,7 @@ class MySQLWorkbenchApp extends PancakesApp {
     return <<<XML
     <value type="object" struct-name="db.mgmt.Connection" id="{$ci['connection_id']}" struct-checksum="0x96ba47d8">
       <link type="object" struct-name="db.mgmt.Driver" key="driver">com.mysql.rdbms.mysql.driver.native_sshtun</link>
-      <value type="string" key="hostIdentifier">Mysql@{$ci['mysql_host']}:{$ci['mysql_port']}@{$ci['sftp_host']}:{$ci['sftp_port']}</va
+      <value type="string" key="hostIdentifier">Mysql@{$ci['mysql_host']}:{$ci['mysql_port']}@{$ci['sftp_host']}:{$ci['sftp_port']}</value>
       <value type="int" key="isDefault">1</value>
       <value _ptr_="0x321bf00" type="dict" key="modules"/>
       <value _ptr_="0x321bf70" type="dict" key="parameterValues">
@@ -101,7 +100,7 @@ class MySQLWorkbenchApp extends PancakesApp {
         <value type="string" key="password">{$ci['mysql_password']}</value>
         <value type="int" key="port">{$ci['mysql_port']}</value>
         <value type="string" key="schema">{$ci['mysql_database']}</value>
-        <value type="string" key="serverVersion">10.0.21-MariaDB-log</value>
+        <value type="string" key="serverVersion">10.0.23-MariaDB-log</value>
         <value type="string" key="sshHost">{$ci['sftp_host']}:{$ci['sftp_port']}</value>
         <value type="string" key="sshKeyFile"></value>
         <value type="string" key="sshPassword"></value>
@@ -113,7 +112,7 @@ class MySQLWorkbenchApp extends PancakesApp {
         <value type="int" key="useSSL">1</value>
         <value type="string" key="userName">{$ci['mysql_username']}</value>
       </value>
-      <value type="string" key="name">{$ci['domain']}</value>
+      <value type="string" key="name">{$ci['sftp_host']}</value>
       <link type="object" struct-name="GrtObject" key="owner">d460176e-fabd-11e5-874c-f0761c1cdeaf</link>
     </value>
 XML;
@@ -130,7 +129,7 @@ XML;
       <value _ptr_="0x32067c0" type="dict" key="serverInfo">
         <value type="int" key="setupPending">1</value>
       </value>
-      <value type="string" key="name">{$ci['domain']}</value>
+      <value type="string" key="name">{$ci['sftp_host']}</value>
     </value>
 XML;
   }
@@ -138,9 +137,9 @@ XML;
   /**
    * Write the XML to the configuration file
    */
-  protected function writeXML($file, $xml, $domain) {
+  protected function writeXML($file, $xml, $sftp_host) {
     $data = file_get_contents($file);
-    if (!strpos($data, $domain)) {
+    if (!strpos($data, $sftp_host)) {
       $lines = file($file);
       $last = sizeof($lines) - 1;
       unset($lines[$last]);
