@@ -7,7 +7,6 @@ use Pantheon\Terminus\Site\SiteAwareInterface;
 use Pantheon\Terminus\Site\SiteAwareTrait;
 use Pantheon\Terminus\Collections\Sites;
 use Pantheon\Terminus\Exceptions\TerminusException;
-use Pantheon\TerminusPancakes\Apps\PancakesApp;
 
 /**
  * Open Site database in your favorite MySQL Editor

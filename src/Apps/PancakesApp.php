@@ -154,7 +154,7 @@ class PancakesApp {
       $command .= ' ' . implode(' ', $arguments);
     }
     $this->logger->debug('Executing: {command}', ['command' => $command]);
-    exec($command, $output, $error_code);
+    return exec($command, $output, $error_code);
   }
 
   /**
