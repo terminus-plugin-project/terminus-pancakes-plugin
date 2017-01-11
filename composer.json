@@ -1,6 +1,6 @@
 {
   "name": "terminus-plugin-project/terminus-pancakes-plugin",
-  "description": "Pancakes - A Terminus plugin for Sequel Pro",
+  "description": "Terminus Plugin to open Pantheon Site Databases in your Favorite SQL Client",
   "homepage": "https://github.com/terminus-plugin-project/terminus-pancakes-plugin",
   "authors": [
     {
