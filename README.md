@@ -16,6 +16,7 @@ For quick install using Composer, install using:
 ### Manually
 
 Download project and unzip to `~/.terminus/plugins/terminus-pancakes-plugin`
+Navigate to project folder and run `composer install`
 
 
 **_Note:_** This plugin will only work with Terminux 1.x. For Terminus 0.13, go [here](https://github.com/derimagia/terminus-pancakes/releases/tag/0.1).
@@ -63,3 +64,8 @@ Likewise, if your version of MySQL Workbench is installed outside the `Program F
 Run `terminus help site:pancakes` for help.
 
 Refer to the [Terminus Getting Started](https://pantheon.io/docs/terminus/plugins/).
+
+## Troubleshooting
+Pancakes can sometimes trigger PHP warnings in `terminus` (even when not using Pancakes), which *may* be related to High Sierra upgrade.
+
+To fix, completely delete Pancakes folder from `~/.terminus/plugins/` directory and re-install following instructions above.
