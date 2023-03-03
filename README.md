@@ -8,6 +8,10 @@ Terminus plugin to open any Pantheon site database using a SQL GUI client.
 
 ## Installation
 
+## Prerequisites
+Plugins directory must exist inside the terminus directory
+`mkdir ~/.terminus/plugins`
+
 ### Composer
 
 For quick install using Composer, install using:
