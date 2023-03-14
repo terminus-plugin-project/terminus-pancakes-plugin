@@ -8,7 +8,11 @@ Terminus plugin to open any Pantheon site database using a SQL GUI client.
 
 ## Installation
 
-### Composer
+### Terminus v3
+
+`terminus self:plugin:install terminus-plugin-project/terminus-pancakes-plugin`
+
+### Composer (Terminus v2 - Deprecated) 
 
 For quick install using Composer, install using:
 
