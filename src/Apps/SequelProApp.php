@@ -60,15 +60,15 @@ class SequelProApp extends PancakesApp {
       <key>database</key>
       <string>{$mysql_database}</string>
       <key>host</key>
-      <string>${mysql_host}</string>
+      <string>{$mysql_host}</string>
       <key>name</key>
-      <string>${label}</string>
+      <string>{$label}</string>
       <key>user</key>
-      <string>${mysql_username}</string>
+      <string>{$mysql_username}</string>
       <key>password</key>
-      <string>${mysql_password}</string>
+      <string>{$mysql_password}</string>
       <key>port</key>
-      <integer>${mysql_port}</integer>
+      <integer>{$mysql_port}</integer>
       <key>rdbms_type</key>
       <string>mysql</string>
     </dict>
