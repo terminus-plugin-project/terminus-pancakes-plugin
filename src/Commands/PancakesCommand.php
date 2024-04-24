@@ -116,7 +116,7 @@ class PancakesCommand extends TerminusCommand Implements SiteAwareInterface {
 
     $this->log()
       ->notice('Opening {site} database in {app}.', [
-        'site' => $env->id . '-' . $site->get('name') . '.pantheon.io',
+        'site' => $env->id . '-' . $site->get('name') . '.pantheonsite.io',
         'app' => $instance->app
       ]);
 
