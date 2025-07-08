@@ -21,7 +21,7 @@
   },
   "extra": {
     "terminus": {
-      "compatible-version": "^1.9|^2"
+      "compatible-version": "^1.9|^2|^3|^4"
     }
   }
 }
